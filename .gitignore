@@ -1,0 +1,7 @@
+# Ignore Docker volumes
+bookstack_app_data/
+bookstack_db_data/
+
+# Ignore system files
+*.log
+.env
