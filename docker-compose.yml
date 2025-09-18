@@ -1,26 +1,26 @@
-version: "2.1"
 services:
   bookstack:
     image: lscr.io/linuxserver/bookstack:latest
     container_name: bookstack
+    entrypoint: sh -c 'while ! nc -z bookstack_db 3306; do echo "Waiting for database..."; sleep 1; done; /init'
     environment:
       - PUID=1000
       - PGID=1000
-      - APP_URL=http://localhost:6875
+      - TZ=${TZ}
+      - APP_URL=${APP_URL}
       - DB_HOST=bookstack_db
       - DB_PORT=3306
-      - DB_DATABASE=bookstackapp
-      - DB_USERNAME=bookstack
-      - DB_PASSWORD=SENTINELprime32
-      - APP_KEY=base64:AdzAR+z2IFmx1cfYMwJSbNIDWsWkPkg2D/4+M8TwH0k=
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - APP_KEY=${APP_KEY}
     volumes:
-      - bookstack_app_data:/config
+      - ./bookstack_db_data:/config/databases
     ports:
-      - 6875:80
+      - "${APP_PORT}:80"
     restart: unless-stopped
     depends_on:
-      bookstack_db:
-        condition: service_healthy
+      - bookstack_db
 
   bookstack_db:
     image: lscr.io/linuxserver/mariadb:latest
@@ -28,20 +28,17 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Africa/Nairobi
-      - MYSQL_ROOT_PASSWORD=SENTINELprime32
-      - MYSQL_DATABASE=bookstackapp
-      - MYSQL_USER=bookstack
-      - MYSQL_PASSWORD=SENTINELprime32
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
-      - bookstack_db_data:/config
+      - bookstack_db_data:/config/databases
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
 volumes:
   bookstack_app_data:
+    driver: local
   bookstack_db_data:
+    driver: local

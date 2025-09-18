@@ -5,3 +5,4 @@ bookstack_db_data/
 # Ignore system files
 *.log
 .env
+.env
