@@ -2,7 +2,6 @@ services:
   bookstack:
     image: lscr.io/linuxserver/bookstack:latest
     container_name: bookstack
-    entrypoint: sh -c 'while ! nc -z bookstack_db 3306; do echo "Waiting for database..."; sleep 1; done; /init'
     environment:
       - PUID=1000
       - PGID=1000
@@ -15,7 +14,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - APP_KEY=${APP_KEY}
     volumes:
-      - ./bookstack_db_data:/config/databases
+      - bookstack_app_data:/config  # Use a named volume for BookStack data
     ports:
       - "${APP_PORT}:80"
     restart: unless-stopped
@@ -34,11 +33,9 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
-      - bookstack_db_data:/config/databases
+      - bookstack_db_data:/config # Use a named volume for MariaDB data
     restart: unless-stopped
 
 volumes:
   bookstack_app_data:
-    driver: local
   bookstack_db_data:
-    driver: local
