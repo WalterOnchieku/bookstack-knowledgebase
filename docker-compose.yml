@@ -39,3 +39,4 @@ services:
 volumes:
   bookstack_app_data:
   bookstack_db_data:
+  #latest
